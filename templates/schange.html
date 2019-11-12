@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<div id="main-menu">
+    <ul id="nav">
+        {% if info[0] == 1 %}
+        <li><a href='/login/user/seller'>Seller</a></li>
+        {% endif %}
+        {% if info[1] == 1 %}
+        <li><a href='/login/user/customer'>Customer</a></li>
+        {% endif %}
+        {% if info[2] == 1 %}
+        <li><a href='/login/user/delivery'>Delivery</a></li>
+        {% endif %}
+    </ul>
+</div>
+
+<div id="container">
+	<div id="content">
+<div id="tt">비밀번호 변경</div>
+<form action='/login/user/schange/pw' method='post'>
+    <input type="password" placeholder="{{passwd}}" name = "passwd">
+    <input type="submit" value="변경">
+ </form>
+<div id="tt">이름 변경</div>
+<form action='/login/user/schange/name' method='post'>
+    <input type="text" placeholder="{{name}}" name = "name">
+    <input type="submit" value="변경">
+ </form>
+
+    </div>
+</div>
+    
+<div id="sidebar">
+	<h1>Seller</h1>
+	<ul>
+		<li><a href='/login/user/seller'>소유중인 가게 리스트</a></li>
+		<li><a href='/login/user/schange'>개인 정보 변경</a></li>
+	</ul>
+</div>
+
+
+
+    
+{% endblock %}

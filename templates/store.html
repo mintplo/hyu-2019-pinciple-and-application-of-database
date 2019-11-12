@@ -1,0 +1,166 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<div id="main-menu">
+    <ul id="nav">
+        {% if info[0] == 1 %}
+        <li><a href='/login/user/seller'>Seller</a></li>
+        {% endif %}
+        {% if info[1] == 1 %}
+        <li><a href='/login/user/customer'>Customer</a></li>
+        {% endif %}
+        {% if info[2] == 1 %}
+        <li><a href='/login/user/delivery'>Delivery</a></li>
+        {% endif %}
+    </ul>
+</div>
+
+<div id="container">
+		<div id="content">
+<div id="tt">가게 정보</div>
+
+<table class="bbs-table">
+<tr>
+  <th style="width: 200px;">정보</th>
+	<th>내용</th>
+</tr>
+
+<tr>
+	<td style="text-align: center;">가게 이름</td>
+  <td style="text-align: center;">{{ store["sname"] }}</td>
+</tr>
+<tr>
+	<td style="text-align: center;">가게 주소</td>
+  <td style="text-align: center;">{{ store["address"] }}</td>
+</tr>
+<tr>
+    <td style="text-align: center;">가게 전화번호</td>
+    <td style="text-align: center;">{{ store["phone"] }}</td>
+</tr>
+<tr>
+  <td style="text-align: center;">Open Time</td>
+  <td style="text-align: center;">{{ store["open_time"] }}</td>
+</tr>
+<tr>
+  <td style="text-align: center;">Close Time </td>
+  <td style="text-align: center;">{{ store["close_time"] }}</td>
+</tr>
+</table>
+
+<div id="tt">메뉴 정보</div>
+<table class="bbs-table">
+<tr>
+    <th>메뉴이름</th>
+    <th style="width: 100px;">메뉴 삭제</th>
+    <th style="width: 200px;" colspan = "2">메뉴 이름 변경</th>
+</tr>
+{% for i in menu %}
+<tr>
+    <td style="text-align: center;">{{i[0]}}</td>
+    <td style="text-align: center;">
+        <form action='/login/user/seller/store/menudel' method='post'>
+        <input type='hidden' name="sid" value="{{sid}}">
+        <input type='hidden' name="menu" value="{{i[0]}}">
+        <input type="submit" value="삭제">
+        </form>
+    </td>
+    <td style="text-align: center;">
+        <form action='/login/user/seller/store/menuchan' method='post'>
+        <input type='text' name="newname">
+        <input type='hidden' name="sid" value="{{sid}}">
+        <input type='hidden' name="menu" value="{{i[0]}}">
+        <input type="submit" value="변경">
+        </form>
+    </td>
+</tr>
+{% endfor %}
+<tr>
+    <th colspan="4">새로운 메뉴 등록</th>
+</tr>
+<form action='/login/user/seller/store/menuadd' method='post'>
+<tr>
+    <td style="text-align: center;"> 메뉴명 </td>
+    <td style="text-align: center;">
+      <input type='text' name="newmenuname">
+    </td>
+    <td style="text-align: center;"> 가격 </td>
+    <td style="text-align: center;">
+      <input type='text' name="newmenuprice">
+    </td>
+</tr>
+<tr>
+    <td style="text-align: center;"> 할인율 </td>
+    <td style="text-align: center;">
+      <input type='text' name="newmenuevent">
+    </td>
+    <td style="text-align: center;"> 추가하시려면 버튼을 누르세요. </td>
+    <td style="text-align: center;" >
+      <input type='hidden' name="sid" value="{{sid}}">
+      <input type="submit" value="메뉴 추가">
+    </td>
+</tr>
+</form>
+</table>
+
+<div id="tt">현재 주문</div>
+<table class="bbs-table">
+<tr>
+    <th>구매자 이메일</th>
+    <th>주문 시간</th>
+    <th>배달원 번호</th>
+    <th>결재 수단</th>
+    <th>주문 확인</th>
+    <th>주문 취소</th>
+</tr>
+{% for i in order %}
+<tr>
+	  <td style="text-align: center;">{{ i[0] }}</td>
+    <td style="text-align: center;">{{ i[1] }}</td>
+    <td style="text-align: center;">{{ i[2] }}</td>
+    {% if i[3] == 0 %}
+    <td style="text-align: center;">페이</td>
+    {% elif i[3] == 1 %}
+    <td style="text-align: center;">신용카드</td>
+    {% elif i[3] == 2 %}
+    <td style="text-align: center;">계좌이체</td>
+    {% else %}
+    <td style="text-align: center;">현금</td>
+    {% endif %}
+    {% if not i[2] %}
+    <td style="text-align: center;">
+        <form action='/login/user/seller/store/ordercheck' method='post'>
+          <input type='hidden' name="orderinfo" value="{{ i[1] }}">
+          <input type="submit" value="확인">
+        </form>
+    </td>
+    {% endif %}
+    {% if i[2] %}
+    <td style="text-align: center;">할당됨</td>
+    {% endif %}
+    <td style="text-align: center;">
+        <form action='/login/user/seller/store/orderdel' method='post'>
+        <input type='hidden' name="orderinfo" value="{{ i[1] }}">
+        <input type="submit" value="취소">
+        </form>
+    </td>
+</tr>
+{% endfor %}
+
+</table>
+
+
+</div>
+</div>
+
+<div id="sidebar">
+	<h1>Seller</h1>
+	<ul>
+		<li><a href='/login/user/seller'>소유중인 가게 리스트</a></li>
+		<li><a href='/login/user/schange'>개인 정보 변경</a></li>
+	</ul>
+</div>
+
+
+
+
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "layout.html" %}
+
+{% block head %}
+{% endblock %}
+
+{% block body %}
+<div id="main-menu">
+    <ul id="nav">
+        {% if info[0] == 1 %}
+        <li><a href='/login/user/seller'>Seller</a></li>
+        {% endif %}
+        {% if info[1] == 1 %}
+        <li><a href='/login/user/customer'>Customer</a></li>
+        {% endif %}
+        {% if info[2] == 1 %}
+        <li><a href='/login/user/delivery'>Delivery</a></li>
+        {% endif %}
+    </ul>
+</div>
+
+<div id="container">
+    <div id="content">
+        <div id="tt">고객 기본 주소로 가게 검색</div>
+            <form action='/login/user/schange/consearch' method='post' name='consearchForm' id='consearchForm'>
+                <input type="text" size = "50px" name = "address" value="{{ cus_addr[0]['address'] }}">
+                <input type="submit" value="보기">
+            </form>
+        <div id="tt">입력 주소로 가게 검색</div>
+            <form action='/login/user/schange/addresssearch' method='post'>
+                <input type="text" name = "keyaddr">
+                <input type="submit" value="검색">
+            </form>
+        <div id="tt">이름으로 가게 검색</div>
+            <form action='/login/user/schange/namesearch' method='post'>
+                <input type="text" name = "name">
+                <input type="submit" value="검색">
+            </form>
+    </div>
+</div>
+
+<div id="sidebar">
+	<h1>Customer</h1>
+	<ul>
+		<li><a href='/login/user/customer'>구매자 관리 화면</a></li>
+        <li><a href='/login/user/customer/order'>주문Order 화면</a></li>
+        <li><a href='/login/user/customer/buy'>구매화면</a></li>
+	</ul>
+</div>
+
+
+
+
+{% endblock %}

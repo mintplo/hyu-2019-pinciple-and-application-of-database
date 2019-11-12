@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<div id="main-menu">
+    <ul id="nav">
+        {% if info[0] == 1 %}
+        <li><a href='/login/user/seller'>Seller</a></li>
+        {% endif %}
+        {% if info[1] == 1 %}
+        <li><a href='/login/user/customer'>Customer</a></li>
+        {% endif %}
+        {% if info[2] == 1 %}
+        <li><a href='/login/user/delivery'>Delivery</a></li>
+        {% endif %}
+    </ul>
+</div>
+
+<div id="container">
+    <div id="content">
+        <div id="tt">안녕하세요 {{ k }}님</div>
+        <div>상단의 메뉴를 클릭해주세요!</div>
+    </div>
+</div>
+
+
+
+
+{% endblock %}

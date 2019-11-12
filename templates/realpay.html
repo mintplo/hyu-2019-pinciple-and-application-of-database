@@ -1,0 +1,73 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<div id="main-menu">
+    <ul id="nav">
+        {% if info[0] == 1 %}
+        <li><a href='/login/user/seller'>Seller</a></li>
+        {% endif %}
+        {% if info[1] == 1 %}
+        <li><a href='/login/user/customer'>Customer</a></li>
+        {% endif %}
+        {% if info[2] == 1 %}
+        <li><a href='/login/user/delivery'>Delivery</a></li>
+        {% endif %}
+    </ul>
+</div>
+
+<div id="container">
+<div id="content">
+<div id="tt">주문 메뉴 확인</div>
+<table class="bbs-table">
+<tr>
+  <th style="width: 200px;">메뉴 이름</th>
+  <th>수량</th>
+</tr>
+{% for i in menulist %}
+<tr>
+    <td style="text-align: center;">{{i[0]}}</td>
+    <td style="text-align: center;">{{i[1]}}</td>
+</tr>
+{% endfor %}
+</table>
+</div>
+<div id="content">
+<div id="tt">결제 수단</div>
+<table class="bbs-table">
+<tr>
+    <th style="width: 200px;">결제수단</th>
+    <th>결제정보</th>
+    <th style="width: 120px;">결제하러가기</th>
+</tr>
+{% for i in payment %}
+<tr>
+    <td style="text-align: center;">{{i["pay_type"]}}</td>
+    <td style="text-align: center;">{{i['pay_num']}}</td>
+    <td style="text-align: center;">
+        <form action='/login/user/customer/storebuy/pay/done' method='post'>
+        <input type='hidden' name="sid" value="{{sid}}">
+        <input type='hidden' name="pay_type" value="{{i['pay_type']}}">
+        <input type='hidden' name="pay_num" value="{{i['pay_num']}}">
+        <input type="submit" value="결제">
+        </form>
+    </td>
+</tr>
+{% endfor %}
+</table>
+
+</div>
+</div>
+
+<div id="sidebar">
+	<h1>Customer</h1>
+	<ul>
+		<li><a href='/login/user/customer'>구매자 관리 화면</a></li>
+        <li><a href='/login/user/customer/order'>주문Order 화면</a></li>
+        <li><a href='/login/user/customer/buy'>구매화면</a></li>
+	</ul>
+</div>
+
+
+
+
+{% endblock %}

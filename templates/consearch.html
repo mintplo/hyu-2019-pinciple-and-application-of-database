@@ -1,0 +1,54 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<div id="main-menu">
+    <ul id="nav">
+        {% if info[0] == 1 %}
+        <li><a href='/login/user/seller'>Seller</a></li>
+        {% endif %}
+        {% if info[1] == 1 %}
+        <li><a href='/login/user/customer'>Customer</a></li>
+        {% endif %}
+        {% if info[2] == 1 %}
+        <li><a href='/login/user/delivery'>Delivery</a></li>
+        {% endif %}
+    </ul>
+</div>
+
+<div id="container">
+<div id="content">
+<div id="tt">검색 결과</div>
+
+<table class="bbs-table">
+<tr>
+    <th style="width: 200px;">이름</th>
+    <th>위치</th>
+    <th>주문하기</th>
+</tr>
+{% for s in store %}
+<tr>
+	<td style="text-align: center;">{{ s["sname"] }}</td>
+    <td style="text-align: center;">{{ s["address"] }}</td>
+    <td style="text-align: center;">
+        <form action='/login/user/customer/storebuy' method='post'>
+        <input type='hidden' name="storesid" value="{{ s['store_id'] }}">
+        <input type="submit" value="가게로 이동">
+        </form>
+    </td>
+</tr>
+{% endfor %}
+</table>
+
+</div>
+</div>
+
+<div id="sidebar">
+	<h1>Customer</h1>
+	<ul>
+		<li><a href='/login/user/customer'>구매자 관리 화면</a></li>
+        <li><a href='/login/user/customer/order'>주문Order 화면</a></li>
+        <li><a href='/login/user/customer/buy'>구매화면</a></li>
+	</ul>
+</div>
+
+{% endblock %}

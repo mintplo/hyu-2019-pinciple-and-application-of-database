@@ -1,0 +1,68 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<div id="main-menu">
+    <ul id="nav">
+        {% if info[0] == 1 %}
+        <li><a href='/login/user/seller'>Seller</a></li>
+        {% endif %}
+        {% if info[1] == 1 %}
+        <li><a href='/login/user/customer'>Customer</a></li>
+        {% endif %}
+        {% if info[2] == 1 %}
+        <li><a href='/login/user/delivery'>Delivery</a></li>
+        {% endif %}
+    </ul>
+</div>
+
+<div id="container">
+	<div id="content">
+<div id="tt">주문 내역</div>
+<table class="bbs-table">
+<tr>
+    <th style="width: 200px;">주문한 가게</th>
+    <th>주문한 총 메뉴 수</th>
+    <th style="width: 120px;">결제수단</th>
+    <th style="width: 120px;">주문 시간</th>
+    <th style="width: 120px;">배달 완료</th>
+</tr>
+{% for i in order %}
+<tr>
+    <td style="text-align: center;">{{i["store_name"]}}</td>
+    <td style="text-align: center;">{{i["menu_count"]}}</td>
+    {% if i["pay_type"] == 1 %}
+    <td style="text-align: center;">페이</td>
+    {% elif i["pay_type"] == 2 %}
+    <td style="text-align: center;">신용카드</td>
+    {% elif i["pay_type"] == 3 %}
+    <td style="text-align: center;">계좌이체</td>
+    {% elif i["pay_type"] == 4 %}
+    <td style="text-align: center;">현금</td>
+    {% else %}
+    <td style="text-align: center;">-</td>
+    {% endif %}
+    <td style="text-align: center;">{{i["order_time"]}}</td>
+    {% if i["delivery_done"] == 0 %}
+    <td style="text-align: center;">배송 전</td>
+    {% elif i["delivery_done"] == 1 %}
+    <td style="text-align: center;">배송 완료</td>
+    {% endif %}
+</tr>
+{% endfor %}
+</table>
+</div>
+</div>
+
+<div id="sidebar">
+	<h1>Customer</h1>
+	<ul>
+		<li><a href='/login/user/customer'>구매자 관리 화면</a></li>
+        <li><a href='/login/user/customer/order'>주문Order 화면</a></li>
+        <li><a href='/login/user/customer/buy'>구매화면</a></li>
+	</ul>
+</div>
+
+
+
+
+{% endblock %}

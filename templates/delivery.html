@@ -1,0 +1,53 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<div id="main-menu">
+    <ul id="nav">
+        {% if info[0] == 1 %}
+        <li><a href='/login/user/seller'>Seller</a></li>
+        {% endif %}
+        {% if info[1] == 1 %}
+        <li><a href='/login/user/customer'>Customer</a></li>
+        {% endif %}
+        {% if info[2] == 1 %}
+        <li><a href='/login/user/delivery'>Delivery</a></li>
+        {% endif %}
+    </ul>
+</div>
+
+<div id="container">
+    <div id="content">
+        <div id="tt">현재 {{ deli['name'] }}님의 배송 중인 주문</div>
+        <table class="bbs-table">
+<tr>
+    <th>가게 이름</th>
+    <th>주문자 이름</th>
+    <th>주문자 전화번호</th>
+    <th>배송지</th>
+    <th>주문시간</th>
+    <th>배송 완료<th>
+</tr>
+{% for i in order %}
+<tr>
+    <td style="text-align: center;">{{i["sname"]}}</td>
+    <td style="text-align: center;">{{i["name"]}}</td>
+    <td style="text-align: center;">{{i["phone"]}}</td>
+    <td style="text-align: center;">{{i["address"]}}</td>
+    <td style="text-align: center;">{{i["order_time"]}}</td>
+    <td>
+        <form action='/login/user/delivery/deliverydone' method='post'>
+            <input type='hidden' name="done" value="done">
+            <input type="submit" value="배송 완료">
+        </form>
+    </td>
+</tr>
+{% endfor %}
+</table>
+
+    </div>
+</div>
+
+
+
+    
+{% endblock %}
