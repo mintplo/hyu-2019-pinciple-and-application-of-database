@@ -21,6 +21,7 @@
 ## Develop Environment
 Based on Mac OSX 10.15 (Catalina)
 
+- Docker for Mac
 - Python 3.7.x
 - Flask
 - PyMySQL
@@ -93,17 +94,29 @@ INTO table db명.테이블명 FIELDS TERMINATED BY ',' LINES TERMINATED BY '\r\n
 
 ## Running
 
-1. Python Library Installation with Pipenv
+1. Running MariaDB for Development with Docker-compose
+
+```bash
+docker-compose up -d
+```
+
+2. Python Library Installation with Pipenv
 
 ```bash
 pipenv install
 pipenv shell
 ```
 
-2. Running Flask Application (activated with pipenv)
+3. SQL Script Run
+
+```bash
+mysql -h127.0.0.1 -uroot -prootpw hanyang < database.sql
+```
+
+4. Running Flask Application (activated with pipenv)
 
 ```bash
 python app.py
 ```
 
-3. Go to `localhost:5000`
+4. Go to `localhost:5000`
