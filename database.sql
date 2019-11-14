@@ -25,12 +25,12 @@ DEFAULT CHARACTER SET = 'utf8';
 DROP TABLE IF EXISTS `sellers`;
 -- # Sellers 테이블 생성
 CREATE TABLE sellers (
-    sellers_id INT UNSIGNED NOT NULL COMMENT '점주 식별 번호', -- AUTO_INCREMENT
+    seller_id INT UNSIGNED NOT NULL COMMENT '점주 식별 번호', -- AUTO_INCREMENT
     email VARCHAR(128) NOT NULL COMMENT '점주 이메일',
     name VARCHAR(16) NOT NULL COMMENT '점주 이름',
     passwd VARCHAR(128) NOT NULL COMMENT '비밀번호',
     phone VARCHAR(11) NOT NULL COMMENT '전화번호',
-    PRIMARY KEY(sellers_id),
+    PRIMARY KEY(seller_id),
     UNIQUE KEY EMAIL_UNIQUE_IDX(email) -- 이메일 중복 제약 조건
 ) ENGINE = InnoDB
 DEFAULT CHARACTER SET = 'utf8';
@@ -65,7 +65,7 @@ CREATE TABLE stores (
     open_time TIME NOT NULL COMMENT '가게 개장시간',
     close_time TIME NOT NULL COMMENT '가게 폐장시간',
     PRIMARY KEY(store_id),
-    FOREIGN KEY(seller_id) REFERENCES sellers(sellers_id)
+    FOREIGN KEY(seller_id) REFERENCES sellers(seller_id)
 ) ENGINE = InnoDB
 DEFAULT CHARACTER SET = 'utf8';
 
@@ -163,7 +163,7 @@ FIELDS
     OPTIONALLY ENCLOSED BY '"'
 LINES
     TERMINATED BY '\r\n'
-(sellers_id, name, phone, email, passwd);
+(seller_id, name, phone, email, passwd);
 
 -- # LOAD store.csv
 LOAD DATA LOCAL INFILE './data/store.csv'

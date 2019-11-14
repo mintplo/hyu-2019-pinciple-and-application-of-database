@@ -56,11 +56,11 @@
 </tr>
 {% for i in menu %}
 <tr>
-    <td style="text-align: center;">{{i[0]}}</td>
+    <td style="text-align: center;">{{i['name']}}</td>
     <td style="text-align: center;">
         <form action='/login/user/seller/store/menudel' method='post'>
         <input type='hidden' name="sid" value="{{sid}}">
-        <input type='hidden' name="menu" value="{{i[0]}}">
+        <input type='hidden' name="menu" value="{{i['menu_id']}}">
         <input type="submit" value="삭제">
         </form>
     </td>
@@ -68,7 +68,7 @@
         <form action='/login/user/seller/store/menuchan' method='post'>
         <input type='text' name="newname">
         <input type='hidden' name="sid" value="{{sid}}">
-        <input type='hidden' name="menu" value="{{i[0]}}">
+        <input type='hidden' name="menu" value="{{i['menu_id']}}">
         <input type="submit" value="변경">
         </form>
     </td>
