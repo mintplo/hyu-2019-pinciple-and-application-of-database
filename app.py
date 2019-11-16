@@ -228,15 +228,15 @@ def store():
     conn = pymysql.connect(**db_connector)
     cur = conn.cursor(pymysql.cursors.DictCursor)
 
-    sql = f"SELECT * FROM stores WHERE store_id = '{sid}'"
+    sql = f"SELECT * FROM stores WHERE store_id = {sid}"
     cur.execute(sql)
     store = cur.fetchone()
 
-    sql = f"SELECT * FROM menu WHERE store_id = '{sid}'"
+    sql = f"SELECT * FROM menu WHERE store_id = {sid}"
     cur.execute(sql)
     menu = cur.fetchall()
 
-    sql = f"SELECT * FROM `order` WHERE store_id = '{sid}'"
+    sql = f"SELECT * FROM `order` WHERE store_id = {sid}"
     cur.execute(sql)
     order = cur.fetchall()
 
@@ -255,6 +255,28 @@ def menuchan():
     메뉴 이름 변경
     해당 가게의 새로 입력 받은 메뉴 이름으로 변경하기 위함
     """
+    sid = request.form.get('sid')
+    menu = request.form.get('menu')
+    newname = request.form.get('newname')
+
+    if not userid['id'] or not userinfo[0]:
+        return render_template('error.html')
+
+    if not sid or not menu or not newname:
+        return render_template(
+            'error.message.html',
+            message="스토어 정보 또는 메뉴 정보가 올바르지 않습니다. 다시 시도해 주세요.")
+
+    conn = pymysql.connect(**db_connector)
+    cur = conn.cursor(pymysql.cursors.DictCursor)
+
+    # menu_id 는 Primary Key 이기 때문에 중복 가능성이 없음. 단독으로 WHERE 조건에 와도 된다고 생각
+    sql = f"UPDATE menu SET name = '{newname}' WHERE menu_id = {menu}"
+    cur.execute(sql)
+
+    conn.commit()
+    conn.close()
+
     return redirect("/login/user/seller/store")
 
 
@@ -267,6 +289,25 @@ def menudel():
     메뉴 삭제(현재 주문중인 메뉴는 삭제 불가)
     해당 가게의 메뉴를 삭제하기 위함
     """
+    if not userid['id'] or not userinfo[0]:
+        return render_template('error.html')
+
+    if not sid or not menu:
+        return render_template(
+            'error.message.html',
+            message="스토어 정보 또는 메뉴 정보가 올바르지 않습니다. 다시 시도해 주세요.")
+
+    conn = pymysql.connect(**db_connector)
+    cur = conn.cursor(pymysql.cursors.DictCursor)
+
+    # TODO: (현재 주문중인 메뉴는 삭제 불가) 조건을 만족해야 함.
+    # menu_id 는 Primary Key 이기 때문에 중복 가능성이 없음. 단독으로 WHERE 조건에 와도 된다고 생각
+    sql = f"DELETE FROM menu WHERE menu_id = {menu}"
+    cur.execute(sql)
+
+    conn.commit()
+    conn.close()
+
     return redirect("/login/user/seller/store")
 
 
@@ -277,6 +318,29 @@ def menuadd():
     메뉴 추가
     해당 가게의 새로 입력(메뉴명, 가격, 할인율) 받은 메뉴를 추가하기 위함
     """
+    sid = request.form.get('sid')
+    newmenuname = request.form.get('newmenuname')
+    newmenuprice = request.form.get('newmenuprice')
+    newmenuevent = request.form.get('newmenuevent')
+
+    # TODO: decorator 처리 before.request
+    if not userid['id'] or not userinfo[0]:
+        return render_template('error.html')
+
+    if not sid or not newmenuname or not newmenuprice or not newmenuevent:
+        return render_template(
+            'error.message.html',
+            message="스토어 정보 새로 등록하려는 메뉴 정보가 올바르지 않습니다. 획인 후 다시 시도해 주세요.")
+
+    conn = pymysql.connect(**db_connector)
+    cur = conn.cursor(pymysql.cursors.DictCursor)
+
+    sql = f"INSERT INTO menu(store_id, name, price, event) VALUES ({sid}, '{newmenuname}', '{newmenuprice}', '{newmenuevent}')"
+    cur.execute(sql)
+
+    conn.commit()
+    conn.close()
+
     return redirect("/login/user/seller/store")
 
 
