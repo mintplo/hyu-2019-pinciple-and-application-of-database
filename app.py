@@ -87,18 +87,20 @@ def user():
 
     if userinfo[0]:
         # seller
-        sql = f"SELECT s.name, st.store_id FROM sellers s, stores st WHERE s.seller_id = '{userid['id']}' AND st.seller_id = s.seller_id"
+        sql = f"SELECT s.name, st.store_id FROM sellers s, stores st WHERE s.seller_id = {userid['id']} AND st.seller_id = s.seller_id"
     elif userinfo[1]:
         # customer
-        sql = f"SELECT * FROM customers WHERE customer_id = '{userid['id']}'"
+        sql = f"SELECT * FROM customers WHERE customer_id = {userid['id']}"
     elif userinfo[2]:
         # delivery
-        sql = f"SELECT * FROM delivery WHERE del_id = '{userid['id']}'"
+        sql = f"SELECT * FROM delivery WHERE del_id = {userid['id']}"
     else:
         return render_template('error.html')
 
     cur.execute(sql)
     info = cur.fetchone()
+
+    conn.close()
 
     # 이름 정보 저장
     name = info['name']
@@ -120,6 +122,21 @@ def schange():
     판매자 개인 정보 변경 페이지
     현재 비밀번호와 이름을 확인하기 위함
     """
+    conn = pymysql.connect(**db_connector)
+    cur = conn.cursor(pymysql.cursors.DictCursor)
+
+    if not userinfo[0] or not userid['id']:
+        return render_template('error.html')
+
+    sql = f"SELECT s.name, st.store_id FROM sellers s, stores st WHERE s.seller_id = {userid['id']} AND st.seller_id = s.seller_id"
+    cur.execute(sql)
+    info = cur.fetchone()
+
+    conn.close()
+
+    # 이름 정보 저장
+    sname = info['name']
+
     return render_template("schange.html",
                            info=userinfo,
                            name=sname,
@@ -132,6 +149,23 @@ def spw():
     """
     로그인한 판매자 비밀번호 변경
     """
+    password = request.form.get('passwd')
+
+    conn = pymysql.connect(**db_connector)
+    cur = conn.cursor(pymysql.cursors.DictCursor)
+
+    if not userinfo[0] or not userid['id'] or not password:
+        return render_template('error.html')
+
+    sql = f"UPDATE sellers SET passwd = '{password}' WHERE seller_id = {userid['id']}"
+    cur.execute(sql)
+
+    conn.commit()
+    conn.close()
+
+    # 정보 갱신
+    userid['passwd'] = password
+
     return redirect("/login/user")
 
 
@@ -141,6 +175,19 @@ def schname():
     """
     로그인한 판매자 이름 변경
     """
+    name = request.form.get('name')
+
+    conn = pymysql.connect(**db_connector)
+    cur = conn.cursor(pymysql.cursors.DictCursor)
+
+    if not userinfo[0] or not userid['id'] or not name:
+        return render_template('error.html')
+
+    sql = f"UPDATE sellers SET name = '{name}' WHERE seller_id = {userid['id']}"
+    cur.execute(sql)
+    conn.commit()
+    conn.close()
+
     return redirect("/login/user")
 
 
