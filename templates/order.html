@@ -59,6 +59,7 @@
     <td style="text-align: center;">
         <form action='/login/user/customer/storebuy' method='post'>
         <input type='text' name="num">
+        <input type='hidden' name="menu_id" value="{{ i['menu_id'] }}">
         <input type='hidden' name="sid" value="{{sid}}">
         <input type='hidden' name="menu" value="{{i['name']}}">
         <input type="submit" value="담기">
@@ -81,14 +82,15 @@
 </tr>
 {% endfor %}
 </table>
-{% if p %}
+{# TODO: 아래의 p CHECK #}
+{#{% if p %}#}
 <div id="list-menu">
     <form action='/login/user/customer/storebuy/pay' method='post'>
         <input type='hidden' name="sid" value="{{sid}}">
         <input type="submit" value="결제">
         </form>
 </div>
-{% endif %}
+{#{% endif %}#}
 
 </div>
 </div>

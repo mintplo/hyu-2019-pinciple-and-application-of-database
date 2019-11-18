@@ -46,6 +46,7 @@
     <td style="text-align: center;">
         <form action='/login/user/customer/storebuy/pay/done' method='post'>
         <input type='hidden' name="sid" value="{{sid}}">
+        <input type='hidden' name='payment_id' value="{{ i['payment_id'] }}">
         <input type='hidden' name="pay_type" value="{{i['pay_type']}}">
         <input type='hidden' name="pay_num" value="{{i['pay_num']}}">
         <input type="submit" value="결제">

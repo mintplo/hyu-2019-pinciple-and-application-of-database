@@ -394,6 +394,20 @@ def customer():
     구매자 관리 화면 페이지
     현재 비밀번호와 이름과 주소를 확인하기 위함
     """
+    if not userid['id'] or not userinfo[1]:
+        return render_template('error.html')
+
+    conn = pymysql.connect(**db_connector)
+    cur = conn.cursor(pymysql.cursors.DictCursor)
+
+    sql = f"SELECT * FROM customers WHERE customer_id = {userid['id']}"
+    cur.execute(sql)
+
+    customer = cur.fetchone()
+
+    conn.commit()
+    conn.close()
+
     return render_template("customer.html", info=userinfo, customer=customer)
 
 
@@ -403,6 +417,28 @@ def cpw():
     """
     로그인한 구매자 비밀번호 변경
     """
+    password = request.form.get('passwd')
+
+    if not userinfo[1] or not userid['id']:
+        return render_template('error.html')
+
+    if not password:
+        return render_template(
+            'error.message.html',
+            message="변경할 비밀번호를 입력하지 않으셨습니다. 확인 후 다시 시도해 주세요.")
+
+    conn = pymysql.connect(**db_connector)
+    cur = conn.cursor(pymysql.cursors.DictCursor)
+
+    sql = f"UPDATE customers SET passwd = '{password}' WHERE customer_id = {userid['id']}"
+    cur.execute(sql)
+
+    conn.commit()
+    conn.close()
+
+    # 정보 갱신
+    userid['passwd'] = password
+
     return redirect("/login/user")
 
 
@@ -412,6 +448,23 @@ def cname():
     """
     로그인한 구매자 이름 변경
     """
+    name = request.form.get('name')
+
+    if not userinfo[1] or not userid['id']:
+        return render_template('error.html')
+
+    if not name:
+        return render_template('error.message.html',
+                               message="변경할 이름을 입력하지 않으셨습니다. 확인 후 다시 시도해 주세요.")
+
+    conn = pymysql.connect(**db_connector)
+    cur = conn.cursor(pymysql.cursors.DictCursor)
+
+    sql = f"UPDATE customers SET name = '{name}' WHERE customer_id = {userid['id']}"
+    cur.execute(sql)
+    conn.commit()
+    conn.close()
+
     return redirect("/login/user")
 
 
@@ -421,6 +474,23 @@ def addchan():
     """
     로그인한 구매자 주소 변경
     """
+    address = request.form.get('address')
+
+    if not userinfo[1] or not userid['id']:
+        return render_template('error.html')
+
+    if not address:
+        return render_template('error.message.html',
+                               message="변경할 주소를 입력하지 않으셨습니다. 확인 후 다시 시도해 주세요.")
+
+    conn = pymysql.connect(**db_connector)
+    cur = conn.cursor(pymysql.cursors.DictCursor)
+
+    sql = f"UPDATE customers SET address = '{address}' WHERE customer_id = {userid['id']}"
+    cur.execute(sql)
+    conn.commit()
+    conn.close()
+
     return redirect("/login/user/customer")
 
 
@@ -431,6 +501,18 @@ def buy():
     구매화면 페이지
     로그인한 구매자의 주소로 가게 검색을 하기 위함
     """
+    if not userinfo[1] or not userid['id']:
+        return render_template('error.html')
+
+    conn = pymysql.connect(**db_connector)
+    cur = conn.cursor(pymysql.cursors.DictCursor)
+
+    sql = f"SELECT * FROM customers WHERE customer_id = {userid['id']}"
+    cur.execute(sql)
+
+    caddress = cur.fetchall()
+    conn.close()
+
     return render_template("buy.html", info=userinfo, cus_addr=caddress)
 
 
@@ -441,6 +523,23 @@ def consearch():
     고객 기본 주수로 가게 검색
     로그인한 구매자의 주소로 부터 가까운 가게 검색을 하기 위함
     """
+    if not userinfo[1] or not userid['id']:
+        return render_template('error.html')
+
+    address = request.form.get('address')
+    if not address:
+        return render_template('error.message.html',
+                               message="검색할 주소를 입력하지 않으셨습니다. 확인 후 다시 시도해 주세요.")
+
+    conn = pymysql.connect(**db_connector)
+    cur = conn.cursor(pymysql.cursors.DictCursor)
+
+    sql = f"SELECT * FROM stores WHERE address LIKE '%{address}%'"
+    cur.execute(sql)
+
+    store = cur.fetchall()
+    conn.close()
+
     return render_template("storesearch.html", info=userinfo, store=store)
 
 
@@ -451,6 +550,23 @@ def namesearch():
     이름으로 가게 검색
     가게의 이름으로 검색하기 위함(부분 일치 가능)
     """
+    if not userinfo[1] or not userid['id']:
+        return render_template('error.html')
+
+    name = request.form.get('name')
+    if not name:
+        return render_template('error.message.html',
+                               message="검색할 이름을 입력하지 않으셨습니다. 확인 후 다시 시도해 주세요.")
+
+    conn = pymysql.connect(**db_connector)
+    cur = conn.cursor(pymysql.cursors.DictCursor)
+
+    sql = f"SELECT * FROM stores WHERE sname LIKE '%{name}%'"
+    cur.execute(sql)
+
+    store = cur.fetchall()
+    conn.close()
+
     return render_template("storesearch.html", info=userinfo, store=store)
 
 
@@ -461,6 +577,23 @@ def addresssearch():
     입력 주소로 가게 검색
     입력한 주소로 가게를 검색하기 위함(부분 일치 가능)
     """
+    if not userinfo[1] or not userid['id']:
+        return render_template('error.html')
+
+    keyaddr = request.form.get('keyaddr')
+    if not keyaddr:
+        return render_template('error.message.html',
+                               message="검색할 주소를 입력하지 않으셨습니다. 확인 후 다시 시도해 주세요.")
+
+    conn = pymysql.connect(**db_connector)
+    cur = conn.cursor(pymysql.cursors.DictCursor)
+
+    sql = f"SELECT * FROM stores WHERE address LIKE '%{keyaddr}%'"
+    cur.execute(sql)
+
+    store = cur.fetchall()
+    conn.close()
+
     return render_template("storesearch.html", info=userinfo, store=store)
 
 
@@ -468,6 +601,7 @@ def addresssearch():
 @app.route("/login/user/customer/storebuy", methods=['GET', 'POST'])
 def storebuy():
     buystoresid = request.form.get('storesid')
+    o_menu_id = request.form.get('menu_id')
     o_menu = request.form.get('menu')
     o_num = request.form.get('num')
     o_sid = request.form.get('sid')
@@ -475,11 +609,28 @@ def storebuy():
     if not buystoresid:
         buystoresid = o_sid
     if o_num and o_num != "0":
-        menulist.append([o_menu, o_num])
+        # TODO: 중복 메뉴 수량 추가
+        menulist.append([o_menu, o_num, o_menu_id])
     """
     가게 정보, 메뉴 정보, 장바구니 페이지
     가게 정보 및 메뉴 정보를 확인하기 위함
     """
+    if not userinfo[1] or not userid['id']:
+        return render_template('error.html')
+
+    conn = pymysql.connect(**db_connector)
+    cur = conn.cursor(pymysql.cursors.DictCursor)
+
+    sql = f"SELECT * FROM stores WHERE store_id = {buystoresid}"
+    cur.execute(sql)
+    store = cur.fetchone()
+
+    sql = f"SELECT * FROM menu WHERE store_id = {buystoresid}"
+    cur.execute(sql)
+    menu = cur.fetchall()
+
+    conn.close()
+
     return render_template("order.html",
                            info=userinfo,
                            store=store,
@@ -498,6 +649,18 @@ def pay():
     결제 수단
     로그인한 구매자의 결제 수단 및 결제정보를 확인하여 원하는 방식으로 결제하기 위함
     """
+    if not userinfo[1] or not userid['id']:
+        return render_template('error.html')
+
+    conn = pymysql.connect(**db_connector)
+    cur = conn.cursor(pymysql.cursors.DictCursor)
+
+    sql = f"SELECT * FROM payment WHERE customer_id = {userid['id']}"
+    cur.execute(sql)
+    payment = cur.fetchall()
+
+    conn.close()
+
     return render_template("realpay.html",
                            info=userinfo,
                            sid=buystoresid,
@@ -511,6 +674,33 @@ def realpay():
     """
     구매자의 주문을 추가와 주문의 상세 내용을 추가하기 위함
     """
+    if not userinfo[1] or not userid['id']:
+        return render_template('error.html')
+
+    sid = request.form.get('sid')
+    payment_id = request.form.get('payment_id')
+    pay_type = request.form.get('pay_type')
+    pay_num = request.form.get('pay_num')
+
+    if not sid or not pay_type or not pay_num or not payment_id:
+        return render_template('error.message.html',
+                               message="결제 정보가 올바르지 않습니다. 확인 후 다시 시도해 주세요.")
+
+    conn = pymysql.connect(**db_connector)
+    cur = conn.cursor(pymysql.cursors.DictCursor)
+
+    now = datetime.datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+    sql = f"INSERT INTO `order`(payment_id, customer_id, store_id, order_time, delivery_done) VALUES ({payment_id}, {userid['id']}, {sid}, '{now}', 0)"
+    cur.execute(sql)
+
+    order_id = conn.insert_id()
+    for item in menulist:
+        sql = f"INSERT INTO orderdetail(order_id, menu_id, quantity) VALUES ({order_id}, {item[2]}, {item[1]})"
+        cur.execute(sql)
+
+    conn.commit()
+    conn.close()
+
     del menulist[:]
     return redirect("/login/user/customer")
 
@@ -522,6 +712,25 @@ def cusorder():
     주문Order 화면
     주문한 가게 이름, 주문한 총 메뉴 수, 결제수단, 주문 시간, 배달 완료 여부를 확인하기 위함
     """
+    if not userinfo[1] or not userid['id']:
+        return render_template('error.html')
+
+    conn = pymysql.connect(**db_connector)
+    cur = conn.cursor(pymysql.cursors.DictCursor)
+    """
+    SELECT
+    od.*,
+    (SELECT stores.sname FROM stores WHERE od.store_id = od.store_id) as store_name,
+    (SELECT count(dt.menu_id) FROM orderdetail dt WHERE dt.order_id = od.order_id GROUP BY dt.order_id) as menu_count,
+    (SELECT p.pay_type FROM payment p WHERE p.payment_id = od.payment_id) as pay_type
+    FROM `order` od WHERE od.customer_id = 10100001;
+    """
+    sql = f"SELECT od.*, (SELECT stores.sname FROM stores WHERE stores.store_id = od.store_id) as store_name, (SELECT count(dt.menu_id) FROM orderdetail dt WHERE dt.order_id = od.order_id GROUP BY dt.order_id) as menu_count, (SELECT p.pay_type FROM payment p WHERE p.payment_id = od.payment_id) as pay_type FROM `order` od WHERE od.customer_id = {userid['id']}"
+    cur.execute(sql)
+
+    od = cur.fetchall()
+    conn.close()
+
     return render_template("payhistory.html", info=userinfo, order=od)
 
 
