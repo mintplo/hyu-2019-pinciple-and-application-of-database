@@ -20,11 +20,6 @@ db_connector = {
     'charset': 'utf8'
 }
 
-# TODO: connection, cur return 공통 처리
-# TODO: Long SQL PEP8 error Resolve
-# TODO: 메뉴가 삭제되면 menu_count나 관련된 부분은 NO?
-# TODO: menulist 도 session 처리?
-
 
 def auth_required(user_type=None):
     def auth_required_decorator(fn):
@@ -132,7 +127,8 @@ def user():
 
     if session['userinfo'][0]:
         # seller
-        sql = f"SELECT s.name, st.store_id FROM sellers s, stores st WHERE s.seller_id = {session['userid']['id']} AND st.seller_id = s.seller_id"
+        sql = f"SELECT s.name, st.store_id FROM sellers s, stores st " \
+              f"WHERE s.seller_id = {session['userid']['id']} AND st.seller_id = s.seller_id"
     elif session['userinfo'][1]:
         # customer
         sql = f"SELECT * FROM customers WHERE customer_id = {session['userid']['id']}"
@@ -172,7 +168,8 @@ def schange():
     conn = pymysql.connect(**db_connector)
     cur = conn.cursor(pymysql.cursors.DictCursor)
 
-    sql = f"SELECT s.name, s.passwd, st.store_id FROM sellers s, stores st WHERE s.seller_id = {session['userid']['id']} AND st.seller_id = s.seller_id"
+    sql = f"SELECT s.name, s.passwd, st.store_id FROM sellers s, stores st " \
+          f"WHERE s.seller_id = {session['userid']['id']} AND st.seller_id = s.seller_id"
     cur.execute(sql)
     info = cur.fetchone()
 
@@ -292,9 +289,14 @@ def store():
     (SELECT c.email FROM customers c WHERE c.customer_id = od.customer_id) as customer_email, 
     (SELECT p.pay_type FROM payment p WHERE p.payment_id = od.payment_id) as pay_type,
     od.*
-    FROM `order` od WHERE od.store_id = {sid}
+    FROM `order` od WHERE od.store_id = 'sid'
     """
-    sql = f"SELECT (SELECT c.email FROM customers c WHERE c.customer_id = od.customer_id) as customer_email, (SELECT p.pay_type FROM payment p WHERE p.payment_id = od.payment_id) as pay_type, od.* FROM `order` od WHERE od.store_id = {sid}"
+    sql = f"SELECT " \
+          f"(SELECT c.email FROM customers c WHERE c.customer_id = od.customer_id) as customer_email, " \
+          f"(SELECT p.pay_type FROM payment p WHERE p.payment_id = od.payment_id) as pay_type, " \
+          f"od.* " \
+          f"FROM `order` od " \
+          f"WHERE od.store_id = {sid}"
     cur.execute(sql)
     order = cur.fetchall()
 
@@ -386,7 +388,8 @@ def menuadd():
     conn = pymysql.connect(**db_connector)
     cur = conn.cursor(pymysql.cursors.DictCursor)
 
-    sql = f"INSERT INTO menu(store_id, name, price, event) VALUES ({sid}, '{newmenuname}', '{newmenuprice}', '{newmenuevent}')"
+    sql = f"INSERT INTO menu(store_id, name, price, event) " \
+          f"VALUES ({sid}, '{newmenuname}', '{newmenuprice}', '{newmenuevent}')"
     cur.execute(sql)
 
     conn.commit()
@@ -412,13 +415,15 @@ def ordercheck():
     conn = pymysql.connect(**db_connector)
     cur = conn.cursor(pymysql.cursors.DictCursor)
 
-    sql = f"SELECT c.address FROM `order` od, customers c WHERE od.order_id = {orderinfo} AND c.customer_id = od.customer_id"
+    sql = f"SELECT c.address FROM `order` od, customers c " \
+          f"WHERE od.order_id = {orderinfo} AND c.customer_id = od.customer_id"
     cur.execute(sql)
 
     customer = cur.fetchone()
     address = customer['address']
 
-    sql = f"SELECT * FROM delivery d WHERE d.area LIKE '%{address}%' AND d.available = 1 AND d.stock > 0 ORDER BY d.stock DESC LIMIT 5"
+    sql = f"SELECT * FROM delivery d " \
+          f"WHERE d.area LIKE '%{address}%' AND d.available = 1 AND d.stock > 0 ORDER BY d.stock DESC LIMIT 5"
     cur.execute(sql)
 
     deli = cur.fetchall()
@@ -780,7 +785,8 @@ def realpay():
     cur = conn.cursor(pymysql.cursors.DictCursor)
 
     now = datetime.datetime.today().strftime('%Y-%m-%d %H:%M:%S')
-    sql = f"INSERT INTO `order`(payment_id, customer_id, store_id, order_time, delivery_done) VALUES ({payment_id}, {session['userid']['id']}, {sid}, '{now}', 0)"
+    sql = f"INSERT INTO `order`(payment_id, customer_id, store_id, order_time, delivery_done) " \
+          f"VALUES ({payment_id}, {session['userid']['id']}, {sid}, '{now}', 0)"
     cur.execute(sql)
 
     order_id = conn.insert_id()
@@ -813,7 +819,12 @@ def cusorder():
     (SELECT p.pay_type FROM payment p WHERE p.payment_id = od.payment_id) as pay_type
     FROM `order` od WHERE od.customer_id = 10100001;
     """
-    sql = f"SELECT od.*, (SELECT stores.sname FROM stores WHERE stores.store_id = od.store_id) as store_name, (SELECT count(dt.menu_id) FROM orderdetail dt WHERE dt.order_id = od.order_id GROUP BY dt.order_id) as menu_count, (SELECT p.pay_type FROM payment p WHERE p.payment_id = od.payment_id) as pay_type FROM `order` od WHERE od.customer_id = {session['userid']['id']}"
+    sql = f"SELECT od.*, " \
+          f"(SELECT stores.sname FROM stores WHERE stores.store_id = od.store_id) as store_name, " \
+          f"(SELECT count(dt.menu_id) FROM orderdetail dt WHERE dt.order_id = od.order_id GROUP BY dt.order_id) " \
+          f"as menu_count, " \
+          f"(SELECT p.pay_type FROM payment p WHERE p.payment_id = od.payment_id) as pay_type " \
+          f"FROM `order` od WHERE od.customer_id = {session['userid']['id']}"
     cur.execute(sql)
 
     od = cur.fetchall()
@@ -841,7 +852,9 @@ def delivery():
     cur.execute(sql)
     deli = cur.fetchone()
 
-    sql = f"SELECT o.order_id, s.sname, c.name, c.phone, c.address, o.order_time FROM `order` o, stores s, customers c WHERE s.store_id = o.store_id AND c.customer_id = o.customer_id AND o.del_id = {session['userid']['id']}"
+    sql = f"SELECT o.order_id, s.sname, c.name, c.phone, c.address, o.order_time " \
+          f"FROM `order` o, stores s, customers c " \
+          f"WHERE s.store_id = o.store_id AND c.customer_id = o.customer_id AND o.del_id = {session['userid']['id']}"
     cur.execute(sql)
     oorder = cur.fetchall()
 
