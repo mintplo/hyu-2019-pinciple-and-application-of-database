@@ -114,32 +114,32 @@
 </tr>
 {% for i in order %}
 <tr>
-	  <td style="text-align: center;">{{ i[0] }}</td>
-    <td style="text-align: center;">{{ i[1] }}</td>
-    <td style="text-align: center;">{{ i[2] }}</td>
-    {% if i[3] == 0 %}
+	  <td style="text-align: center;">{{ i['customer_email'] }}</td>
+    <td style="text-align: center;">{{ i['order_time'] }}</td>
+    <td style="text-align: center;">{{ i['del_id'] }}</td>
+    {% if i['pay_type'] == 0 %}
     <td style="text-align: center;">페이</td>
-    {% elif i[3] == 1 %}
+    {% elif i['pay_type'] == 1 %}
     <td style="text-align: center;">신용카드</td>
-    {% elif i[3] == 2 %}
+    {% elif i['pay_type'] == 2 %}
     <td style="text-align: center;">계좌이체</td>
     {% else %}
     <td style="text-align: center;">현금</td>
     {% endif %}
-    {% if not i[2] %}
+    {% if not i['del_id'] %}
     <td style="text-align: center;">
         <form action='/login/user/seller/store/ordercheck' method='post'>
-          <input type='hidden' name="orderinfo" value="{{ i[1] }}">
+          <input type='hidden' name="orderinfo" value="{{ i['order_id'] }}">
           <input type="submit" value="확인">
         </form>
     </td>
     {% endif %}
-    {% if i[2] %}
+    {% if i['del_id'] %}
     <td style="text-align: center;">할당됨</td>
     {% endif %}
     <td style="text-align: center;">
         <form action='/login/user/seller/store/orderdel' method='post'>
-        <input type='hidden' name="orderinfo" value="{{ i[1] }}">
+        <input type='hidden' name="orderinfo" value="{{ i['order_id'] }}">
         <input type="submit" value="취소">
         </form>
     </td>

@@ -17,6 +17,9 @@ db_connector = {
     'charset': 'utf8'
 }
 
+# TODO: 메뉴 삭제되는 경우 SET NULL 확인
+# TODO: 메뉴가 삭제되면 menu_count나 관련된 부분은 NO?
+
 
 @app.route("/")
 def index():
@@ -235,8 +238,14 @@ def store():
     sql = f"SELECT * FROM menu WHERE store_id = {sid}"
     cur.execute(sql)
     menu = cur.fetchall()
-
-    sql = f"SELECT * FROM `order` WHERE store_id = {sid}"
+    """
+    SELECT
+    (SELECT c.email FROM customers c WHERE c.customer_id = od.customer_id) as customer_email, 
+    (SELECT p.pay_type FROM payment p WHERE p.payment_id = od.payment_id) as pay_type,
+    od.*
+    FROM `order` od WHERE od.store_id = {sid}
+    """
+    sql = f"SELECT (SELECT c.email FROM customers c WHERE c.customer_id = od.customer_id) as customer_email, (SELECT p.pay_type FROM payment p WHERE p.payment_id = od.payment_id) as pay_type, od.* FROM `order` od WHERE od.store_id = {sid}"
     cur.execute(sql)
     order = cur.fetchall()
 
@@ -357,6 +366,26 @@ def ordercheck():
     2. 현재 배달 가능한 상태
     3. 남은 횟수가 0이 아닌 상태
     """
+    # TODO: decorator 처리 before.request
+    if not userid['id'] or not userinfo[0]:
+        return render_template('error.html')
+
+    conn = pymysql.connect(**db_connector)
+    cur = conn.cursor(pymysql.cursors.DictCursor)
+
+    sql = f"SELECT c.address FROM `order` od, customers c WHERE od.order_id = {orderinfo} AND c.customer_id = od.customer_id"
+    cur.execute(sql)
+
+    customer = cur.fetchone()
+    address = customer['address']
+
+    sql = f"SELECT * FROM delivery d WHERE d.area LIKE '%{address}%' AND d.available = 1 AND d.stock > 0 ORDER BY d.stock DESC LIMIT 5"
+    cur.execute(sql)
+
+    deli = cur.fetchall()
+
+    conn.close()
+
     return render_template("ordercheck.html",
                            info=userinfo,
                            view=deli,
@@ -370,7 +399,26 @@ def orderreal():
     현재 주문에 배달원 ID 할당
     현재 주문에 대해 배달대행원의 배달원 ID를 할당하기 위함
     """
+    # TODO: decorator 처리 before.request
+    if not userid['id'] or not userinfo[0]:
+        return render_template('error.html')
+
+    del_id = request.form.get('did')
+    order_info = request.form.get('orderinfo')
+
+    if not del_id or not order_info:
+        return render_template(
+            'error.message.html',
+            message="배달원 할당 정보가 올바르지 않습니다. 확인 후 다시 시도해 주세요.")
+
+    conn = pymysql.connect(**db_connector)
+    cur = conn.cursor(pymysql.cursors.DictCursor)
+
+    sql = f"UPDATE `order` SET del_id = {del_id} WHERE order_id = {order_info}"
+    cur.execute(sql)
+    conn.commit()
     conn.close()
+
     return redirect("/login/user/seller/store")
 
 
@@ -381,6 +429,25 @@ def orderdel():
     주문 취소
     현재 주문을 취소하기 위함
     """
+    # TODO: decorator 처리 before.request
+    if not userid['id'] or not userinfo[0]:
+        return render_template('error.html')
+
+    order_id = request.form.get('orderinfo')
+
+    if not order_id:
+        return render_template(
+            'error.message.html',
+            message="삭제할 주문 정보가 올바르지 않습니다. 확인 후 다시 시도해 주세요.")
+
+    conn = pymysql.connect(**db_connector)
+    cur = conn.cursor(pymysql.cursors.DictCursor)
+
+    sql = f"DELETE FROM `order` WHERE order_id = {order_id}"
+    cur.execute(sql)
+    conn.commit()
+    conn.close()
+
     return redirect("/login/user/seller/store")
 
 
