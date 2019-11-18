@@ -17,6 +17,7 @@ db_connector = {
     'charset': 'utf8'
 }
 
+# TODO: userid, userinfo, menulist session 처리
 # TODO: 메뉴가 삭제되면 menu_count나 관련된 부분은 NO?
 
 
@@ -675,8 +676,15 @@ def storebuy():
     if not buystoresid:
         buystoresid = o_sid
     if o_num and o_num != "0":
-        # TODO: 중복 메뉴 수량 추가
-        menulist.append([o_menu, o_num, o_menu_id])
+        # 중복 메뉴 수량 추가 로직 추가!
+        is_added = False
+        for ind, value in enumerate(menulist):
+            if o_menu in value:
+                is_added = True
+                menulist[ind][1] = int(menulist[ind][1]) + int(o_num)
+
+        if not is_added:
+            menulist.append([o_menu, int(o_num), o_menu_id])
     """
     가게 정보, 메뉴 정보, 장바구니 페이지
     가게 정보 및 메뉴 정보를 확인하기 위함
