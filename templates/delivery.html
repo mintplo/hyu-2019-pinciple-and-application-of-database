@@ -36,6 +36,7 @@
     <td style="text-align: center;">{{i["order_time"]}}</td>
     <td>
         <form action='/login/user/delivery/deliverydone' method='post'>
+            <input type="hidden" name="order_id" value="{{ i['order_id'] }}" />
             <input type='hidden' name="done" value="done">
             <input type="submit" value="배송 완료">
         </form>
@@ -49,5 +50,5 @@
 
 
 
-    
+
 {% endblock %}

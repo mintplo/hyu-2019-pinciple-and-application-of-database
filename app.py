@@ -17,7 +17,6 @@ db_connector = {
     'charset': 'utf8'
 }
 
-# TODO: 메뉴 삭제되는 경우 SET NULL 확인
 # TODO: 메뉴가 삭제되면 menu_count나 관련된 부분은 NO?
 
 
@@ -309,7 +308,7 @@ def menudel():
     conn = pymysql.connect(**db_connector)
     cur = conn.cursor(pymysql.cursors.DictCursor)
 
-    # TODO: (현재 주문중인 메뉴는 삭제 불가) 조건을 만족해야 함.
+    # TODO: (현재 주문중인 메뉴는 삭제 불가) 조건을 만족해야 함. = 배달 완료된 주문은 주문중인 메뉴로 안치는건가?
     # menu_id 는 Primary Key 이기 때문에 중복 가능성이 없음. 단독으로 WHERE 조건에 와도 된다고 생각
     sql = f"DELETE FROM menu WHERE menu_id = {menu}"
     cur.execute(sql)
@@ -805,12 +804,29 @@ def cusorder():
 
 
 # 현재 배송 중인 주문
+# TODO: 배송 완료된 주문은 어떻게 해야하는지?
 @app.route("/login/user/delivery", methods=['GET', 'POST'])
 def delivery():
     """
     현재 OOO님의 배송 중인 주문 페이지
     가게 이름, 주문자 이름, 주문자 전화번호, 배송지, 주문시간, 배송 완료 여부를 확인하기 위함
     """
+    if not userinfo[2] or not userid['id']:
+        return render_template('error.html')
+
+    conn = pymysql.connect(**db_connector)
+    cur = conn.cursor(pymysql.cursors.DictCursor)
+
+    sql = f"SELECT * FROM delivery WHERE del_id = {userid['id']}"
+    cur.execute(sql)
+    deli = cur.fetchone()
+
+    sql = f"SELECT o.order_id, s.sname, c.name, c.phone, c.address, o.order_time FROM `order` o, stores s, customers c WHERE s.store_id = o.store_id AND c.customer_id = o.customer_id"
+    cur.execute(sql)
+    oorder = cur.fetchall()
+
+    conn.close()
+
     return render_template("delivery.html",
                            info=userinfo,
                            order=oorder,
@@ -824,6 +840,23 @@ def deliverydone():
     배송 완료
     배달대행원이 배달 완료 시 배달 완료 여부를 배달 완료로 갱신하기 위함
     """
+    if not userinfo[2] or not userid['id']:
+        return render_template('error.html')
+
+    order_id = request.form.get('order_id')
+    if not order_id:
+        return render_template('error.message.html',
+                               message="주문 정보가 올바르지 않습니다. 확인 후 다시 시도해 주세요.")
+
+    conn = pymysql.connect(**db_connector)
+    cur = conn.cursor(pymysql.cursors.DictCursor)
+
+    sql = f"UPDATE `order` SET delivery_done = 1 WHERE order_id = {order_id}"
+
+    cur.execute(sql)
+    conn.commit()
+    conn.close()
+
     return redirect("/login/user/delivery")
 
 
