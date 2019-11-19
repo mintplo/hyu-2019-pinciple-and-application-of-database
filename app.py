@@ -60,6 +60,7 @@ def index():
     userinfo[1] = 0
     userinfo[2] = 0
     session['userinfo'] = userinfo
+    session.modified = True
 
     return render_template("login.html")
 
@@ -105,6 +106,7 @@ def login():
 
     session['userid'] = userid
     session['userinfo'] = userinfo
+    session.modified = True
 
     conn.close()
     return redirect("/login/user")
@@ -151,7 +153,7 @@ def user():
         session['userid']['storesid'] = info['store_id']
         session.modified = True
 
-    return render_template("user.html", info=userinfo, k=name)
+    return render_template("user.html", info=session['userinfo'], k=name)
 
 
 # ========== 판매자 ==========
@@ -256,7 +258,9 @@ def seller():
     store = cur.fetchall()
     conn.close()
 
-    return render_template("seller.html", info=userinfo, store=store)
+    return render_template("seller.html",
+                           info=session['userinfo'],
+                           store=store)
 
 
 # 가게 정보, 메뉴 정보, 현재 주문
@@ -301,7 +305,7 @@ def store():
     order = cur.fetchall()
 
     return render_template("store.html",
-                           info=userinfo,
+                           info=session['userinfo'],
                            store=store,
                            menu=menu,
                            sid=sid,
@@ -431,7 +435,7 @@ def ordercheck():
     conn.close()
 
     return render_template("ordercheck.html",
-                           info=userinfo,
+                           info=session['userinfo'],
                            view=deli,
                            orderinfo=orderinfo)
 
@@ -511,7 +515,9 @@ def customer():
     conn.commit()
     conn.close()
 
-    return render_template("customer.html", info=userinfo, customer=customer)
+    return render_template("customer.html",
+                           info=session['userinfo'],
+                           customer=customer)
 
 
 # 구매자 비밀번호 변경
@@ -609,7 +615,9 @@ def buy():
     caddress = cur.fetchall()
     conn.close()
 
-    return render_template("buy.html", info=userinfo, cus_addr=caddress)
+    return render_template("buy.html",
+                           info=session['userinfo'],
+                           cus_addr=caddress)
 
 
 # 고객 기본 주소로 가게 검색
@@ -635,7 +643,9 @@ def consearch():
     store = cur.fetchall()
     conn.close()
 
-    return render_template("storesearch.html", info=userinfo, store=store)
+    return render_template("storesearch.html",
+                           info=session['userinfo'],
+                           store=store)
 
 
 # 이름으로 가게 검색
@@ -661,7 +671,9 @@ def namesearch():
     store = cur.fetchall()
     conn.close()
 
-    return render_template("storesearch.html", info=userinfo, store=store)
+    return render_template("storesearch.html",
+                           info=session['userinfo'],
+                           store=store)
 
 
 # 입력 주소로 가게 검색
@@ -687,7 +699,9 @@ def addresssearch():
     store = cur.fetchall()
     conn.close()
 
-    return render_template("storesearch.html", info=userinfo, store=store)
+    return render_template("storesearch.html",
+                           info=session['userinfo'],
+                           store=store)
 
 
 # 가게 정보, 메뉴 정보, 장바구니
@@ -730,7 +744,7 @@ def storebuy():
     conn.close()
 
     return render_template("order.html",
-                           info=userinfo,
+                           info=session['userinfo'],
                            store=store,
                            menu=menu,
                            menulist=menulist,
@@ -743,8 +757,8 @@ def storebuy():
 def pay():
     buystoresid = request.form.get('sid')
     if not menulist:
+        # TODO: payerror.html 없는 이유? = menulist 없이 바로 결제 해버릴 경우
         return render_template("payerror.html")
-    # TODO: payerror.html 없는 이유?
     """
     결제 수단
     로그인한 구매자의 결제 수단 및 결제정보를 확인하여 원하는 방식으로 결제하기 위함
@@ -759,7 +773,7 @@ def pay():
     conn.close()
 
     return render_template("realpay.html",
-                           info=userinfo,
+                           info=session['userinfo'],
                            sid=buystoresid,
                            payment=payment,
                            menulist=menulist)
@@ -830,14 +844,15 @@ def cusorder():
     od = cur.fetchall()
     conn.close()
 
-    return render_template("payhistory.html", info=userinfo, order=od)
+    return render_template("payhistory.html",
+                           info=session['userinfo'],
+                           order=od)
 
 
 # ========== 배달대행원 ==========
 
 
 # 현재 배송 중인 주문
-# TODO: 배송 완료된 주문은 어떻게 해야하는지?
 @app.route("/login/user/delivery", methods=['GET', 'POST'])
 @auth_required('delivery')
 def delivery():
@@ -854,14 +869,15 @@ def delivery():
 
     sql = f"SELECT o.order_id, s.sname, c.name, c.phone, c.address, o.order_time " \
           f"FROM `order` o, stores s, customers c " \
-          f"WHERE s.store_id = o.store_id AND c.customer_id = o.customer_id AND o.del_id = {session['userid']['id']}"
+          f"WHERE s.store_id = o.store_id AND c.customer_id = o.customer_id AND o.del_id = {session['userid']['id']} " \
+          f"AND o.delivery_done = 0"
     cur.execute(sql)
     oorder = cur.fetchall()
 
     conn.close()
 
     return render_template("delivery.html",
-                           info=userinfo,
+                           info=session['userinfo'],
                            order=oorder,
                            deli=deli)
 
