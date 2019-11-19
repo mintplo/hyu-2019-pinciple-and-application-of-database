@@ -1,9 +1,8 @@
 version: '3'
 
 services:
-  # mariadb container
-  mariadb:
-    image: 'mariadb:10.2'
+  database:
+    image: 'mysql:5.7'
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     environment:
       MYSQL_ROOT_PASSWORD: rootpw
@@ -13,4 +12,4 @@ services:
     ports:
       - '3306:3306'
     volumes:
-      - './.mariadb:/var/lib/mysql'
+      - './.database:/var/lib/mysql'
