@@ -273,6 +273,7 @@ def store():
         session['userid']["storesid"] = sid
         session.modified = True
 
+    # 아래의 코드는 무시하거나 지워도 된다.
     sid = session['userid']["storesid"]
     """
     가게 정보, 메뉴 정보, 현재 주문 페이지
@@ -360,7 +361,18 @@ def menudel():
     conn = pymysql.connect(**db_connector)
     cur = conn.cursor(pymysql.cursors.DictCursor)
 
-    # TODO: (현재 주문중인 메뉴는 삭제 불가) 조건을 만족해야 함. = 배달 완료된 주문은 주문중인 메뉴로 안치는건가?
+    sql = f"SELECT count(o.order_id) as order_count FROM orderdetail od, `order` o " \
+          f"WHERE od.menu_id = {menu} AND o.order_id = od.order_id AND o.delivery_done = 0"
+    cur.execute(sql)
+    order_count = int(cur.fetchone()['order_count'])
+
+    if order_count > 0:
+        conn.close()
+
+        return render_template(
+            'error.message.html',
+            message="현재 주문중인 메뉴는 삭제 불가합니다. 확인 후 다시 시도해 주세요.")
+
     # menu_id 는 Primary Key 이기 때문에 중복 가능성이 없음. 단독으로 WHERE 조건에 와도 된다고 생각
     sql = f"DELETE FROM menu WHERE menu_id = {menu}"
     cur.execute(sql)
@@ -757,7 +769,6 @@ def storebuy():
 def pay():
     buystoresid = request.form.get('sid')
     if not menulist:
-        # TODO: payerror.html 없는 이유? = menulist 없이 바로 결제 해버릴 경우
         return render_template("payerror.html")
     """
     결제 수단
