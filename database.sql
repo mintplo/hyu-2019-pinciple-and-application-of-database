@@ -10,7 +10,7 @@ SET @@session.foreign_key_checks = 0;
 DROP TABLE IF EXISTS `customers`;
 -- # Customers 테이블 생성
 CREATE TABLE customers (
-    customer_id INT UNSIGNED NOT NULL COMMENT '고객 식별 번호', -- AUTO_INCREMENT
+    customer_id INT UNSIGNED NOT NULL COMMENT '고객 식별 번호',
     email VARCHAR(128) NOT NULL COMMENT '고객 이메일',
     name VARCHAR(16) NOT NULL COMMENT '고객 이름',
     passwd VARCHAR(128) NOT NULL COMMENT '비밀번호',
@@ -25,7 +25,7 @@ DEFAULT CHARACTER SET = 'utf8';
 DROP TABLE IF EXISTS `sellers`;
 -- # Sellers 테이블 생성
 CREATE TABLE sellers (
-    seller_id INT UNSIGNED NOT NULL COMMENT '점주 식별 번호', -- AUTO_INCREMENT
+    seller_id INT UNSIGNED NOT NULL COMMENT '점주 식별 번호',
     email VARCHAR(128) NOT NULL COMMENT '점주 이메일',
     name VARCHAR(16) NOT NULL COMMENT '점주 이름',
     passwd VARCHAR(128) NOT NULL COMMENT '비밀번호',
@@ -39,7 +39,7 @@ DEFAULT CHARACTER SET = 'utf8';
 DROP TABLE IF EXISTS `delivery` CASCADE;
 -- # Delivery 테이블 생성
 CREATE TABLE delivery (
-    del_id INT UNSIGNED NOT NULL COMMENT '배달원 식별 번호', -- AUTO_INCREMENT
+    del_id INT UNSIGNED NOT NULL COMMENT '배달원 식별 번호',
     email VARCHAR(128) NOT NULL COMMENT '배달원 이메일',
     name VARCHAR(16) NOT NULL COMMENT '배달원 이름',
     passwd VARCHAR(128) NOT NULL COMMENT '비밀번호',
