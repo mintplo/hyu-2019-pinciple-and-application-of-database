@@ -291,7 +291,7 @@ def store():
     menu = cur.fetchall()
     """
     SELECT
-    (SELECT c.email FROM customers c WHERE c.customer_id = od.customer_id) as customer_email, 
+    (SELECT c.email FROM customers c WHERE c.customer_id = od.customer_id) as customer_email,
     (SELECT p.pay_type FROM payment p WHERE p.payment_id = od.payment_id) as pay_type,
     od.*
     FROM `order` od WHERE od.store_id = 'sid'
@@ -301,7 +301,7 @@ def store():
           f"(SELECT p.pay_type FROM payment p WHERE p.payment_id = od.payment_id) as pay_type, " \
           f"od.* " \
           f"FROM `order` od " \
-          f"WHERE od.store_id = {sid}"
+          f"WHERE od.store_id = {sid} AND od.delivery_done = 0"
     cur.execute(sql)
     order = cur.fetchall()
 
@@ -422,7 +422,7 @@ def ordercheck():
     """
     배달원 할당
     현재 주문에 대해 배달 가능한 배달대행원을 최대 5명까지 확인하기 위함(남은 횟수가 높은 순서로 확인)
-    
+
     배달 가능한 배달대행원:
     1. 배달 가능한 지역(가게와 가까운 지역)
     2. 현재 배달 가능한 상태
